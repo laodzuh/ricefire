@@ -21,8 +21,6 @@
 <% end %>
 
 <section class="panel txt-align-center flex flex-column gap" style="view-transition-name: account-settings">
-  <%= render "users/themes/picker", user: Current.user %>
-
   <% if Current.user.can_administer? %>
     <div class="align-center center avatar__form gap" data-controller="upload-preview">
       <%= form_with model: @account, method: :patch, class: "txt--medium", data: { controller: "form" } do |form| %>
@@ -112,6 +110,8 @@
       </turbo-frame>
     </menu>
   </div>
+
+  <%= render "users/themes/picker", user: Current.user %>
 </section>
 
 <% content_for :footer do %>
