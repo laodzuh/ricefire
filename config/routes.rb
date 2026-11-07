@@ -42,6 +42,8 @@ Rails.application.routes.draw do
       scope defaults: { user_id: "me" } do
         resource :sidebar, only: :show
         resource :profile
+        resource :theme, only: %i[ show update ]
+        resource :theme_sync_token, only: :create
         resources :push_subscriptions do
           scope module: "push_subscriptions" do
             resources :test_notifications, only: :create
@@ -50,6 +52,9 @@ Rails.application.routes.draw do
       end
     end
   end
+
+  # Omarchy's theme-set hook sends the theme it just switched to (contrib/omarchy/theme-set-hook)
+  resource :theme_sync, only: :update, module: :users
 
   namespace :autocompletable do
     resources :users, only: :index

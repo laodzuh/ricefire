@@ -1,0 +1,11 @@
+#!/bin/bash
+# Sends Omarchy's theme to Campfire whenever it changes. Omarchy runs this with the theme's name.
+# Settings (CAMPFIRE_URL, CAMPFIRE_THEME_KEY) are on your Campfire profile, under Theme.
+
+source "$HOME/.config/omarchy/campfire.env" 2>/dev/null || exit 0
+colors="$HOME/.local/state/omarchy/current/theme/colors.toml"
+[[ -n $CAMPFIRE_URL && -n $CAMPFIRE_THEME_KEY && -f $colors ]] || exit 0
+
+curl -fsS --max-time 10 -X PUT "${CAMPFIRE_URL%/}/theme_sync" \
+  -H "Authorization: Bearer $CAMPFIRE_THEME_KEY" -H "X-Theme-Name: $1" -H "Content-Type: text/plain" \
+  --data-binary "@$colors" >/dev/null 2>&1 &

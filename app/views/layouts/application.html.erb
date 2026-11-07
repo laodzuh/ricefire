@@ -6,8 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, interactive-widget=resizes-content">
     <meta name="view-transition" content="same-origin">
     <meta name="color-scheme" content="light dark">
-    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+    <% if theme_background = Current.user&.current_theme&.colors&.dig("background") %>
+      <meta name="theme-color" content="<%= theme_background %>">
+    <% else %>
+      <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+      <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+    <% end %>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <%= csp_meta_tag %>
     <%= current_user_meta_tags %>
@@ -22,6 +26,7 @@
 
     <%= stylesheet_link_tag :all, "data-turbo-track": "reload" %>
     <%= custom_styles_tag %>
+    <%= render "users/themes/style", theme: Current.user&.current_theme %>
 
     <%= javascript_importmap_tags %>
 
@@ -63,6 +68,7 @@
     <%= render "layouts/lightbox" %>
 
     <% if Current.session %>
+      <%= turbo_stream_from Current.user, :theme %>
       <%= tag.div hidden: true, data: { controller: "push-subscription-sync",
             push_subscription_sync_url_value: user_push_subscriptions_path, push_subscription_sync_session_value: push_subscription_session_marker } %>
     <% end %>

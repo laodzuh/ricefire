@@ -115,6 +115,11 @@
     </menu>
   </div>
 
+  <%= link_to user_theme_path, class: "btn center" do %>
+    <%= image_tag "settings.svg", aria: { hidden: "true" }, size: 20 %>
+    <span>Theme<%= ": #{@user.current_theme.name}" if @user.current_theme %></span>
+  <% end %>
+
   <%= render "users/profiles/transfer", user: @user %>
 
   <% if Rails.env.development? %>

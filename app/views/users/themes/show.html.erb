@@ -1,0 +1,75 @@
+<% @page_title = "Theme" %>
+
+<% content_for :nav do %>
+  <div class="flex-item-justify-start">
+    <%= link_back_to user_profile_path %>
+  </div>
+<% end %>
+
+<section class="panel flex flex-column gap">
+  <h1 class="txt-large center margin-none">Theme</h1>
+
+  <%= form_with model: @user, url: user_theme_path, method: :patch, data: { controller: "form" } do |form| %>
+    <div class="theme-picker">
+      <label class="btn theme-picker__option">
+        <%= form.radio_button :theme, "", checked: @user.theme.nil?, data: { action: "change->form#submit" } %>
+        <span>Campfire</span>
+      </label>
+
+      <% if synced = @user.synced %>
+        <label class="btn theme-picker__option">
+          <%= form.radio_button :theme, User::Theming::SYNCED, data: { action: "change->form#submit" } %>
+          <span>Omarchy: <%= synced.name %></span>
+          <%= render "users/themes/swatches", theme: synced %>
+        </label>
+      <% end %>
+
+      <% Theme.bundled.each_value do |theme| %>
+        <label class="btn theme-picker__option">
+          <%= form.radio_button :theme, theme.slug, data: { action: "change->form#submit" } %>
+          <span><%= theme.name %></span>
+          <%= render "users/themes/swatches", theme: theme %>
+        </label>
+      <% end %>
+    </div>
+  <% end %>
+
+  <fieldset id="omarchy">
+    <legend class="txt-medium">Follow Omarchy</legend>
+
+    <div class="flex flex-column gap">
+      <p class="margin-none txt-small">
+        Switch themes in Omarchy and Campfire switches with it, on every device you're signed in on.
+      </p>
+
+      <% if @user.theme_sync_token %>
+        <% config = "CAMPFIRE_URL=#{request.base_url}\nCAMPFIRE_THEME_KEY=#{@user.theme_sync_token}\n" %>
+
+        <label class="txt-small" for="theme_sync_config">1. Save this as <code>~/.config/omarchy/campfire.env</code></label>
+        <textarea class="input input--code txt-small" id="theme_sync_config" rows="2" readonly><%= config %></textarea>
+        <div class="flex justify-center">
+          <%= button_to_copy_to_clipboard(config) do %>
+            <span class="for-screen-reader">Copy settings</span>
+            <%= image_tag "copy-paste.svg", aria: { hidden: "true" }, size: 20, class: "colorize--black" %>
+          <% end %>
+        </div>
+
+        <label class="txt-small" for="theme_sync_hook">2. Save this as <code>~/.config/omarchy/hooks/theme-set.d/campfire</code></label>
+        <textarea class="input input--code txt-small" id="theme_sync_hook" rows="8" wrap="off" readonly><%= theme_sync_hook %></textarea>
+        <div class="flex justify-center">
+          <%= button_to_copy_to_clipboard(theme_sync_hook) do %>
+            <span class="for-screen-reader">Copy hook</span>
+            <%= image_tag "copy-paste.svg", aria: { hidden: "true" }, size: 20, class: "colorize--black" %>
+          <% end %>
+        </div>
+
+        <p class="margin-none txt-small">3. Switch themes in Omarchy.</p>
+
+        <%= button_to "Reset key", user_theme_sync_token_path, class: "btn txt-small center",
+              form: { data: { turbo_confirm: "Reset the key? Omarchy stops syncing until you update campfire.env." } } %>
+      <% else %>
+        <%= button_to "Set up", user_theme_sync_token_path, class: "btn center" %>
+      <% end %>
+    </div>
+  </fieldset>
+</section>

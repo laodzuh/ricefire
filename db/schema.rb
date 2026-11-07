@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_10_07_190000) do
+ActiveRecord::Schema[8.2].define(version: 2026_11_07_180000) do
   create_table "accounts", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "custom_styles"
@@ -157,8 +157,12 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_07_190000) do
     t.integer "role", default: 0, null: false
     t.integer "status", default: 0, null: false
     t.datetime "updated_at", null: false
+    t.string "theme"
+    t.json "synced_theme"
+    t.string "theme_sync_token"
     t.index ["bot_token"], name: "index_users_on_bot_token", unique: true
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
+    t.index ["theme_sync_token"], name: "index_users_on_theme_sync_token", unique: true
   end
 
   create_table "webhooks", force: :cascade do |t|
@@ -184,4 +188,3 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_07_190000) do
   # Note that virtual tables may not work with other database engines. Be careful if changing database.
   create_virtual_table "message_search_index", "fts5", ["body", "tokenize=porter"]
 end
-
