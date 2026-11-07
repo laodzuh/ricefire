@@ -42,7 +42,7 @@ Rails.application.routes.draw do
       scope defaults: { user_id: "me" } do
         resource :sidebar, only: :show
         resource :profile
-        resource :theme, only: %i[ show update ]
+        resource :theme, only: :update
         resource :theme_sync_token, only: :create
         resources :push_subscriptions do
           scope module: "push_subscriptions" do

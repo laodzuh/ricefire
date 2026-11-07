@@ -64,7 +64,7 @@
 .theme-picker {
   display: grid;
   gap: var(--block-space-half);
-  grid-template-columns: repeat(auto-fill, minmax(12em, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(13em, 1fr));
 }
 
 .theme-picker__option {
@@ -92,4 +92,9 @@
     inline-size: 1.1em;
     margin-inline-start: -0.35em;
   }
+}
+
+.theme-sync summary {
+  cursor: pointer;
+  text-align: center;
 }

@@ -1,0 +1,32 @@
+<fieldset id="theme">
+  <legend class="txt-medium">Theme</legend>
+
+  <div class="flex flex-column gap">
+    <%= form_with model: user, url: user_theme_path, method: :patch, data: { controller: "form" } do |form| %>
+      <div class="theme-picker">
+        <label class="btn txt-small theme-picker__option">
+          <%= form.radio_button :theme, "", checked: user.theme.nil?, data: { action: "change->form#submit" } %>
+          <span>Campfire</span>
+        </label>
+
+        <% if synced = user.synced %>
+          <label class="btn txt-small theme-picker__option">
+            <%= form.radio_button :theme, User::Theming::SYNCED, data: { action: "change->form#submit" } %>
+            <span>Omarchy: <%= synced.name %></span>
+            <%= render "users/themes/swatches", theme: synced %>
+          </label>
+        <% end %>
+
+        <% Theme.bundled.each_value do |theme| %>
+          <label class="btn txt-small theme-picker__option">
+            <%= form.radio_button :theme, theme.slug, data: { action: "change->form#submit" } %>
+            <span><%= theme.name %></span>
+            <%= render "users/themes/swatches", theme: theme %>
+          </label>
+        <% end %>
+      </div>
+    <% end %>
+
+    <%= render "users/themes/sync", user: user %>
+  </div>
+</fieldset>

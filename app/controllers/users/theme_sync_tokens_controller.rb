@@ -1,6 +1,12 @@
 class Users::ThemeSyncTokensController < ApplicationController
   def create
     Current.user.reset_theme_sync_token
-    redirect_to user_theme_url(anchor: "omarchy"), notice: "✓"
+
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.replace("omarchy", partial: "users/themes/sync", locals: { user: Current.user, open: true })
+      end
+      format.html { redirect_to user_profile_url(anchor: "omarchy") }
+    end
   end
 end
