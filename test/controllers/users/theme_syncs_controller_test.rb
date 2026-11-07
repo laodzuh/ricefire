@@ -27,7 +27,7 @@ class Users::ThemeSyncsControllerTest < ActionDispatch::IntegrationTest
     sync @colors, name: "tokyo-night"
 
     sign_in :david
-    get user_profile_url
+    get edit_account_url
     assert_select ".theme-picker__option", text: /Omarchy: Tokyo Night/
     assert_select "input[type=radio][value=omarchy][checked]"
   end
@@ -95,7 +95,7 @@ class Users::ThemeSyncsControllerTest < ActionDispatch::IntegrationTest
     assert_response :no_content
 
     sign_in :david
-    get user_profile_url
+    get edit_account_url
     assert_no_match(/<script>alert|onerror=|display:none/, response.body)
     assert_select "style#theme_style[data-mode=dark]"
   end

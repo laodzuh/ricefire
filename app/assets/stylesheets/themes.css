@@ -25,6 +25,9 @@
 
   .unread .direct__author::after { background-color: var(--color-link); }
 
+  /* Your own messages in a bubble tinted with the accent (emoji-only messages keep having no bubble) */
+  .message--me:not(.message--emoji) .message__body-content { --message-background: oklch(var(--theme-own-message)); }
+
   /* The sidebar on the theme's panel color, like a bar or launcher beside the windows */
   .sidebar #sidebar { background-color: oklch(var(--theme-panel) / 0.9); }
 

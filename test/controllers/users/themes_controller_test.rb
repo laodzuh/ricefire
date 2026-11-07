@@ -5,12 +5,23 @@ class Users::ThemesControllerTest < ActionDispatch::IntegrationTest
     sign_in :david
   end
 
-  test "the profile lists the bundled themes" do
-    get user_profile_url
+  test "the settings page lists the bundled themes" do
+    get edit_account_url
 
     assert_response :success
     assert_select "#theme .theme-picker__option", count: Theme.bundled.size + 1
     assert_select "style#theme_style:not([data-mode])"
+  end
+
+  test "members who aren't admins get the picker too" do
+    sign_in :kevin
+    assert_not users(:kevin).administrator?
+
+    get edit_account_url
+
+    assert_response :success
+    assert_select "#theme .theme-picker__option", count: Theme.bundled.size + 1
+    assert_select "#omarchy"
   end
 
   test "picking a theme swaps its styles in place" do
@@ -26,9 +37,9 @@ class Users::ThemesControllerTest < ActionDispatch::IntegrationTest
   test "picking a theme without Turbo" do
     patch user_theme_url, params: { user: { theme: "gruvbox" } }
 
-    assert_redirected_to user_profile_url(anchor: "theme")
+    assert_redirected_to edit_account_url(anchor: "theme")
 
-    get user_profile_url
+    get edit_account_url
     assert_select "style#theme_style[data-mode=dark][data-turbo-track=reload]", text: /--lch-white/
     assert_select "meta[name=theme-color][content=?]", Theme.find("gruvbox").colors["background"]
   end
@@ -45,7 +56,7 @@ class Users::ThemesControllerTest < ActionDispatch::IntegrationTest
   test "a theme that doesn't exist" do
     patch user_theme_url, params: { user: { theme: "nope" } }
 
-    assert_redirected_to user_profile_url(anchor: "theme")
+    assert_redirected_to edit_account_url(anchor: "theme")
     assert_equal "That theme isn't available.", flash[:alert]
     assert_nil users(:david).reload.theme
   end
@@ -57,7 +68,7 @@ class Users::ThemesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "setting up Omarchy sync shows the key in place" do
-    get user_profile_url
+    get edit_account_url
     assert_select "#omarchy textarea#theme_sync_config", count: 0
 
     post user_theme_sync_token_url, as: :turbo_stream
@@ -70,7 +81,7 @@ class Users::ThemesControllerTest < ActionDispatch::IntegrationTest
       assert_select "template textarea#theme_sync_hook", text: /theme_sync/
     end
 
-    get user_profile_url
+    get edit_account_url
     assert_select "#omarchy textarea#theme_sync_config", text: /CAMPFIRE_THEME_KEY=#{token}/
   end
 end

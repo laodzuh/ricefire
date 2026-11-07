@@ -6,7 +6,7 @@ class Users::ThemeSyncTokensController < ApplicationController
       format.turbo_stream do
         render turbo_stream: turbo_stream.replace("omarchy", partial: "users/themes/sync", locals: { user: Current.user, open: true })
       end
-      format.html { redirect_to user_profile_url(anchor: "omarchy") }
+      format.html { redirect_to edit_account_url(anchor: "omarchy") }
     end
   end
 end

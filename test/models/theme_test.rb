@@ -24,6 +24,7 @@ class ThemeTest < ActiveSupport::TestCase
     css = Theme.find("tokyo-night").to_css
 
     assert_match(/--theme-panel:\d+\.\d\d% \d\.\d{4} \d+\.\d\d;/, css)
+    assert_match(/--theme-own-message:\d+\.\d\d% \d\.\d{4} \d+\.\d\d;/, css)
     assert_match(/--theme-icon-filter:invert\(\d+\.\d%\);/, css)
     assert_match(/--theme-icon-on-accent-filter:invert\(\d+\.\d%\);/, css)
   end

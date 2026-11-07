@@ -129,12 +129,14 @@ class Theme
       }
     end
 
-    # For themes.css, which spreads the theme further than colors.css reaches: a panel color for the sidebar, and
-    # filters that turn Campfire's black icons into the theme's text color, or its background color on accent buttons.
+    # For themes.css, which spreads the theme further than colors.css reaches: a panel color for the sidebar, a bubble
+    # tinted with the accent for your own messages, and filters that turn Campfire's black icons into the theme's text
+    # color, or its background color on accent buttons.
     # A filter can only set an icon's brightness, so icons match the color's lightness rather than its hue.
     def palette_variables
       {
         "theme-panel" => (color("dark_background") || background.mix(foreground, 0.04)).to_lch,
+        "theme-own-message" => named_colors["lch-gray"].mix(accent, 0.18).to_lch,
         "theme-icon-filter" => foreground.to_invert_filter,
         "theme-icon-on-accent-filter" => background.to_invert_filter
       }
