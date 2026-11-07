@@ -75,7 +75,9 @@ class Theme
   end
 
   def to_css
-    variables = named_colors.transform_values(&:to_lch).merge(code_colors.transform_values(&:to_css))
+    variables = named_colors.transform_values(&:to_lch)
+      .merge(code_colors.transform_values(&:to_css))
+      .merge(palette_variables)
 
     ":root{color-scheme:#{mode};" + variables.map { |name, value| "--#{name}:#{value};" }.join + "}"
   end
@@ -124,6 +126,17 @@ class Theme
         "markup-list" => color("yellow") || accent,
         "markup-inserted" => color("green") || accent,
         "markup-deleted" => color("red") || accent
+      }
+    end
+
+    # For themes.css, which spreads the theme further than colors.css reaches: a panel color for the sidebar, and
+    # filters that turn Campfire's black icons into the theme's text color, or its background color on accent buttons.
+    # A filter can only set an icon's brightness, so icons match the color's lightness rather than its hue.
+    def palette_variables
+      {
+        "theme-panel" => (color("dark_background") || background.mix(foreground, 0.04)).to_lch,
+        "theme-icon-filter" => foreground.to_invert_filter,
+        "theme-icon-on-accent-filter" => background.to_invert_filter
       }
     end
 

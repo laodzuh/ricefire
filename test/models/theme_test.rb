@@ -20,6 +20,20 @@ class ThemeTest < ActiveSupport::TestCase
     assert_match(/--keyword:oklch\(/, css)
   end
 
+  test "renders the panel color and icon filters" do
+    css = Theme.find("tokyo-night").to_css
+
+    assert_match(/--theme-panel:\d+\.\d\d% \d\.\d{4} \d+\.\d\d;/, css)
+    assert_match(/--theme-icon-filter:invert\(\d+\.\d%\);/, css)
+    assert_match(/--theme-icon-on-accent-filter:invert\(\d+\.\d%\);/, css)
+  end
+
+  test "icon filters match the color's lightness" do
+    assert_equal "invert(100.0%)", Theme::Oklab.from_hex("#ffffff").to_invert_filter
+    assert_equal "invert(0.0%)", Theme::Oklab.from_hex("#000000").to_invert_filter
+    assert_equal "invert(50.2%)", Theme::Oklab.from_hex("#808080").to_invert_filter
+  end
+
   test "keeps only hex colors, so nothing else reaches the page" do
     theme = Theme.from_toml("evil", <<~TOML)
       background = "#000000;}body{display:none"

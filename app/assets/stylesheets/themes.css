@@ -1,20 +1,53 @@
 /*
-  User themes (see Theme). The theme's colors come in a <style id="theme_style"> after the stylesheets. These rules
-  redo, for the theme's mode, the ones elsewhere that follow the OS color scheme, mostly icons inverted for dark mode,
-  so a dark theme on a light-mode OS (and the reverse) still shows its icons. Keyed to the style element's data-mode
-  so a live theme change switches them along with the colors.
+  User themes (see Theme). The theme's colors come in a <style id="theme_style"> after the stylesheets, overriding
+  colors.css. The rules here take the theme further than those named colors reach, the way an Omarchy theme colors
+  the whole desktop: accent on the things that are selected, current or waiting, icons in the theme's text color, and
+  the sidebar on its own panel color. They also redo, for the theme's mode, the rules elsewhere that follow the OS
+  color scheme, so a dark theme on a light-mode OS (and the reverse) still looks right. Keyed to the style element so
+  a live theme change switches them along with the colors.
 */
+
+:root:has(#theme_style[data-mode]) {
+  /* Accent where Campfire uses reversed text: the current room, send and save, checked toggles */
+  .btn--reversed,
+  .btn:has(input:checked) {
+    --btn-background: var(--color-link);
+    --btn-color: var(--color-bg);
+  }
+
+  /* Unread rooms and directs are marked in accent */
+  .room.unread {
+    --btn-border-color: var(--color-link);
+    --hover-color: var(--color-link);
+
+    &:not(:hover) { box-shadow: 0 0 0 1px var(--color-link); }
+  }
+
+  .unread .direct__author::after { background-color: var(--color-link); }
+
+  /* The sidebar on the theme's panel color, like a bar or launcher beside the windows */
+  .sidebar #sidebar { background-color: oklch(var(--theme-panel) / 0.9); }
+
+  /* Icons in the theme's text color, and its background color on accent */
+  .colorize--black,
+  .notifications-help img,
+  .composer__file-caption::after,
+  .btn:where(:has(img):not(.avatar)) img:not([class]) {
+    filter: var(--theme-icon-filter);
+  }
+
+  .btn:has(input:checked) img,
+  :is(.btn--reversed, .btn--negative) img:not(.avatar) {
+    filter: var(--theme-icon-on-accent-filter);
+  }
+
+  @media (max-width: 100ch) {
+    .open .sidebar__toggle img { filter: var(--theme-icon-filter); }
+  }
+}
 
 :root:has(#theme_style[data-mode="dark"]) {
   .colorize--white { filter: invert(0%); }
-  .colorize--black { filter: invert(100%); }
-
-  .notifications-help img { filter: invert(100); }
-  .composer__file-caption::after { filter: invert(100%); }
-
-  .btn:where(:has(img):not(.avatar)) img:not([class]) { filter: invert(100%); }
-  .btn:has(input:checked) img { filter: invert(0); }
-  :is(.btn--reversed, .btn--negative) img:not(.avatar) { filter: invert(0%); }
 
   .message--mentioned .message__body-content { --message-background: oklch(var(--lch-red) / 0.2); }
 
@@ -27,22 +60,10 @@
       0 .8em 1.2em -1.6em oklch(var(--lch-always-black) / 0.9),
       0 1.2em 1.6em -2em oklch(var(--lch-always-black) / 1);
   }
-
-  @media (max-width: 100ch) {
-    .open .sidebar__toggle img { filter: invert(100%); }
-  }
 }
 
 :root:has(#theme_style[data-mode="light"]) {
   .colorize--white { filter: invert(100%); }
-  .colorize--black { filter: invert(0%); }
-
-  .notifications-help img { filter: none; }
-  .composer__file-caption::after { filter: none; }
-
-  .btn:where(:has(img):not(.avatar)) img:not([class]) { filter: invert(0); }
-  .btn:has(input:checked) img { filter: invert(100%); }
-  :is(.btn--reversed, .btn--negative) img:not(.avatar) { filter: invert(100%); }
 
   .message--mentioned .message__body-content { --message-background: oklch(var(--lch-red) / 0.1); }
 
@@ -54,10 +75,6 @@
       0 .4em .8em -1.2em oklch(var(--lch-always-black) / 0.4),
       0 .8em 1.2em -1.6em oklch(var(--lch-always-black) / 0.5),
       0 1.2em 1.6em -2em oklch(var(--lch-always-black) / 0.6);
-  }
-
-  @media (max-width: 100ch) {
-    .open .sidebar__toggle img { filter: invert(0); }
   }
 }
 

@@ -48,4 +48,12 @@ class Theme::Oklab
   def to_css
     "oklch(#{to_lch})"
   end
+
+  # The filter that turns black into the gray with this color's lightness: invert(n) maps black to the sRGB gray n
+  def to_invert_filter
+    linear = lightness.clamp(0, 1)**3
+    gray = linear <= 0.0031308 ? linear * 12.92 : 1.055 * linear**(1 / 2.4) - 0.055
+
+    format("invert(%.1f%%)", gray * 100)
+  end
 end
