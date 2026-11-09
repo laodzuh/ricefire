@@ -53,6 +53,13 @@ Rails.application.routes.draw do
     end
   end
 
+  resource :radio, only: :show do
+    scope module: :radio do
+      resources :tracks, only: %i[ index create update destroy ]
+      resource :station, only: :update
+    end
+  end
+
   # Omarchy's theme-set hook sends the theme it just switched to (contrib/omarchy/theme-set-hook)
   resource :theme_sync, only: :update, module: :users
 

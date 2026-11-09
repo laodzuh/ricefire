@@ -1,0 +1,34 @@
+<ol id="radio_tracks" class="radio-tracks">
+  <% tracks.each_with_index do |track, index| %>
+    <li class="radio-tracks__track flex align-center gap">
+      <span class="radio-tracks__name overflow-ellipsis flex-item-grow"><%= track.name %></span>
+
+      <span class="txt-small radio-tracks__status">
+        <% if track.ready? %>
+          <%= Time.at(track.duration_ms / 1000).utc.strftime(track.duration_ms >= 3_600_000 ? "%-H:%M:%S" : "%-M:%S") %>
+        <% elsif track.failed? %>
+          Couldn't read this file
+        <% else %>
+          Processing…
+        <% end %>
+      </span>
+
+      <%= button_to radio_track_path(track, direction: "up"), method: :patch, class: "btn txt-small", disabled: index.zero?,
+            aria: { label: "Move #{track.name} up" } do %>
+        <%= image_tag "arrow-up.svg", size: 14, aria: { hidden: "true" }, class: "colorize--black" %>
+      <% end %>
+      <%= button_to radio_track_path(track, direction: "down"), method: :patch, class: "btn txt-small", disabled: index == tracks.size - 1,
+            aria: { label: "Move #{track.name} down" } do %>
+        <%= image_tag "arrow-down.svg", size: 14, aria: { hidden: "true" }, class: "colorize--black" %>
+      <% end %>
+      <%= button_to radio_track_path(track), method: :delete, class: "btn btn--negative txt-small",
+            aria: { label: "Remove #{track.name}" }, form: { data: { turbo_confirm: "Remove #{track.name}?" } } do %>
+        <%= image_tag "trash.svg", size: 14, aria: { hidden: "true" } %>
+      <% end %>
+    </li>
+  <% end %>
+
+  <% if tracks.empty? %>
+    <li class="txt-small txt-align-center">No songs yet. Until you add some, the radio plays the live stream.</li>
+  <% end %>
+</ol>

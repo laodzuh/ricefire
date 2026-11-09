@@ -1,0 +1,53 @@
+<% @page_title = "Radio" %>
+
+<% content_for :nav do %>
+  <div class="flex-item-justify-start">
+    <%= link_back_to edit_account_path %>
+  </div>
+<% end %>
+
+<%= turbo_stream_from :radio_admin %>
+
+<section class="panel panel--wide flex flex-column gap radio-admin">
+  <div class="txt-align-center">
+    <h1 class="margin-none">Radio</h1>
+    <p class="margin-none txt-small">Everyone who turns the radio on hears the same song at the same moment.</p>
+  </div>
+
+  <fieldset>
+    <legend class="txt-medium">On air</legend>
+
+    <%= form_with model: @station, url: radio_station_path, method: :patch, class: "flex flex-column gap", data: { controller: "form" } do |form| %>
+      <div class="flex gap justify-center flex-wrap">
+        <label class="btn">
+          <%= form.radio_button :source, "playlist", data: { action: "change->form#submit" } %>
+          <span>Your songs</span>
+        </label>
+        <label class="btn">
+          <%= form.radio_button :source, "stream", data: { action: "change->form#submit" } %>
+          <span>Live stream</span>
+        </label>
+      </div>
+
+      <label class="flex flex-column gap-half txt-small">
+        <span>Live stream (a YouTube link). It plays when you pick it above, and whenever there are no songs ready.</span>
+        <div class="flex gap">
+          <%= form.url_field :stream_url, class: "input flex-item-grow", placeholder: "https://www.youtube.com/watch?v=…" %>
+          <%= form.button "Save", class: "btn" %>
+        </div>
+      </label>
+    <% end %>
+  </fieldset>
+
+  <fieldset>
+    <legend class="txt-medium">Songs</legend>
+
+    <%= form_with url: radio_tracks_path, multipart: true, class: "flex gap align-center justify-center flex-wrap" do |form| %>
+      <%= form.file_field :audio_files, multiple: true, accept: "audio/*,.flac,.m4a,.mp3,.ogg,.opus,.wav,.aiff,.aif", class: "input flex-item-grow" %>
+      <%= form.button "Upload", class: "btn btn--reversed" %>
+    <% end %>
+    <p class="txt-small txt-align-center">MP3 and AAC play as they are. Other formats, like FLAC, are converted to AAC after upload.</p>
+
+    <%= render "radio/tracks/tracks", tracks: @tracks %>
+  </fieldset>
+</section>

@@ -1,0 +1,23 @@
+<%# Permanent, so music keeps playing as people move between rooms %>
+<div id="radio" class="radio" data-turbo-permanent
+     data-controller="radio" data-radio-url-value="<%= radio_path(format: :json) %>"
+     data-action="message@window->radio#receive">
+  <%= turbo_stream_from :radio %>
+  <span id="radio_signal" data-radio-target="signal"></span>
+
+  <div class="radio__screen" data-radio-target="screen" hidden></div>
+  <audio data-radio-target="audio" preload="none" data-action="ended->radio#sync"></audio>
+
+  <div class="radio__bar flex align-center gap">
+    <button type="button" class="btn radio__toggle flex-item-no-shrink" data-radio-target="toggle" data-action="radio#toggle" aria-pressed="false">
+      <%= image_tag "radio-play.svg", size: 16, aria: { hidden: "true" }, class: "radio__icon radio__icon--play colorize--black" %>
+      <%= image_tag "radio-stop.svg", size: 16, aria: { hidden: "true" }, class: "radio__icon radio__icon--stop" %>
+      <span class="for-screen-reader">Radio on or off</span>
+    </button>
+
+    <span class="radio__now txt-small overflow-ellipsis flex-item-grow" data-radio-target="now" aria-live="polite">Radio</span>
+
+    <input type="range" class="radio__volume" min="0" max="100" step="1" value="70" aria-label="Radio volume"
+           data-radio-target="volume" data-action="input->radio#setVolume">
+  </div>
+</div>

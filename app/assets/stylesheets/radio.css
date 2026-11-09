@@ -1,0 +1,142 @@
+/* The radio: a bar just above the sidebar's tools, and the live stream's player above it when that's on */
+
+:root {
+  --radio-height: calc(var(--btn-size) + var(--block-space));
+}
+
+.radio {
+  inset: auto 0 var(--sidebar-tools-height) auto;
+  padding-inline: var(--sidebar-inline-space);
+  position: fixed;
+  z-index: 1;
+
+  @media (min-width: 100ch) {
+    inline-size: var(--sidebar-width);
+  }
+
+  @media (max-width: 100ch) {
+    inline-size: 100%;
+
+    #sidebar:not(.open) & { display: none; }
+  }
+
+  body:not(.sidebar) & { display: none; }
+}
+
+body:has(#radio) .sidebar__container {
+  padding-block-end: calc(var(--sidebar-tools-height) + var(--radio-height));
+}
+
+.radio__bar {
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  background-color: oklch(var(--lch-white) / 0.5);
+  block-size: var(--radio-height);
+  border: 1px solid var(--color-border);
+  border-radius: 2em;
+  padding-inline: 0.4em 0.8em;
+}
+
+.radio__toggle {
+  --btn-size: 2.2em;
+
+  aspect-ratio: 1;
+  border-radius: 50%;
+  padding: 0;
+  place-content: center;
+
+  .radio--on & {
+    --btn-background: var(--color-link);
+    --btn-border-color: var(--color-link);
+  }
+}
+
+.radio__icon--stop,
+.radio--on .radio__icon--play { display: none; }
+
+.radio--on .radio__icon--stop {
+  display: inline;
+  filter: var(--theme-icon-on-accent-filter, invert(100%));
+}
+
+.radio__now {
+  min-inline-size: 0;
+  white-space: nowrap;
+
+  .radio--on & { color: var(--color-link); }
+}
+
+.radio__volume {
+  --fill: 70%;
+  --track: linear-gradient(to right, var(--color-link) var(--fill), var(--color-border-darker) var(--fill));
+
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+  inline-size: 5em;
+
+  &::-webkit-slider-runnable-track { background: var(--track); block-size: 0.3em; border-radius: 1em; }
+  &::-moz-range-track { background: var(--track); block-size: 0.3em; border-radius: 1em; }
+
+  &::-webkit-slider-thumb {
+    appearance: none;
+    background: var(--color-link);
+    block-size: 0.9em;
+    border-radius: 50%;
+    inline-size: 0.9em;
+    margin-block-start: -0.3em;
+  }
+
+  &::-moz-range-thumb { background: var(--color-link); block-size: 0.9em; border: 0; border-radius: 50%; inline-size: 0.9em; }
+}
+
+/* YouTube asks for its player to be visible, at least 200px wide */
+.radio__screen {
+  aspect-ratio: 16 / 9;
+  border-radius: 0.75em;
+  margin-block-end: var(--block-space-half);
+  min-inline-size: 200px;
+  overflow: hidden;
+
+  iframe {
+    block-size: 100%;
+    border: 0;
+    inline-size: 100%;
+  }
+}
+
+/* Managing the radio */
+.radio-admin label.btn {
+  position: relative;
+
+  input[type="radio"] { opacity: 0; pointer-events: none; position: absolute; }
+}
+
+.radio-tracks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--block-space-half);
+  list-style: none;
+  margin: var(--block-space) 0 0;
+  padding: 0;
+}
+
+.radio-tracks__track {
+  border-block-end: 1px solid var(--color-border);
+  padding-block: var(--block-space-half);
+
+  form { display: contents; }
+
+  .btn[disabled] { opacity: 0.3; }
+}
+
+.radio-tracks__name {
+  min-inline-size: 0;
+  white-space: nowrap;
+}
+
+.radio-tracks__status {
+  opacity: 0.7;
+  white-space: nowrap;
+}

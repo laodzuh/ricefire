@@ -111,6 +111,13 @@
     </menu>
   </div>
 
+  <% if Current.user.can_administer? %>
+    <%= link_to radio_tracks_path, class: "btn center" do %>
+      <%= image_tag "radio-play.svg", size: 16, aria: { hidden: "true" }, class: "colorize--black" %>
+      <span>Radio</span>
+    <% end %>
+  <% end %>
+
   <%= render "users/themes/picker", user: Current.user %>
 </section>
 

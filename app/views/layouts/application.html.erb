@@ -63,6 +63,7 @@
 
     <aside id="sidebar" data-controller="toggle-class" data-toggle-class-toggle-class="open">
       <%= yield :sidebar %>
+      <%= render "radio/player" if Current.session %>
     </aside>
 
     <%= render "layouts/lightbox" %>

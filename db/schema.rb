@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_11_07_180000) do
+ActiveRecord::Schema[8.2].define(version: 2026_11_08_020000) do
   create_table "accounts", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "custom_styles"
@@ -116,6 +116,25 @@ ActiveRecord::Schema[8.2].define(version: 2026_11_07_180000) do
     t.integer "user_id", null: false
     t.index ["endpoint", "p256dh_key", "auth_key"], name: "idx_on_endpoint_p256dh_key_auth_key_7553014576"
     t.index ["user_id"], name: "index_push_subscriptions_on_user_id"
+  end
+
+  create_table "radio_stations", force: :cascade do |t|
+    t.string "source", default: "playlist", null: false
+    t.bigint "epoch_ms", null: false
+    t.string "stream_url"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "radio_tracks", force: :cascade do |t|
+    t.string "title"
+    t.string "artist"
+    t.integer "duration_ms"
+    t.integer "position", null: false
+    t.string "status", default: "processing", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["position"], name: "index_radio_tracks_on_position"
   end
 
   create_table "rooms", force: :cascade do |t|
