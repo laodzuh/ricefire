@@ -6,8 +6,10 @@
       Switch themes in Omarchy and Campfire switches with it, on every device you're signed in on.
     </p>
 
-    <% if user.theme_sync_token %>
-      <% config = "CAMPFIRE_URL=#{request.base_url}\nCAMPFIRE_THEME_KEY=#{user.theme_sync_token}\n" %>
+    <% if token = local_assigns[:token] %>
+      <% config = "CAMPFIRE_URL=#{request.base_url}\nCAMPFIRE_THEME_KEY=#{token}\n" %>
+
+      <p class="margin-none txt-small"><strong>Copy your key now.</strong> Campfire only keeps a fingerprint of it, so it can't show it again.</p>
 
       <label class="txt-small" for="theme_sync_config">1. Save this as <code>~/.config/omarchy/campfire.env</code></label>
       <textarea class="input input--code txt-small" id="theme_sync_config" rows="2" readonly><%= config %></textarea>
@@ -28,6 +30,13 @@
       </div>
 
       <p class="margin-none txt-small">3. Switch themes in Omarchy.</p>
+
+      <%= button_to "Reset key", user_theme_sync_token_path, class: "btn txt-small center",
+            form: { data: { turbo_confirm: "Reset the key? Omarchy stops syncing until you update campfire.env." } } %>
+    <% elsif user.syncing_theme? %>
+      <p class="margin-none txt-small">
+        Omarchy is connected. Need the settings again? Reset the key to get a new one; the old one stops working.
+      </p>
 
       <%= button_to "Reset key", user_theme_sync_token_path, class: "btn txt-small center",
             form: { data: { turbo_confirm: "Reset the key? Omarchy stops syncing until you update campfire.env." } } %>

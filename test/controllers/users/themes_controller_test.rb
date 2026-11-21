@@ -67,21 +67,23 @@ class Users::ThemesControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "setting up Omarchy sync shows the key in place" do
+  test "setting up Omarchy sync shows the key once" do
     get edit_account_url
     assert_select "#omarchy textarea#theme_sync_config", count: 0
 
     post user_theme_sync_token_url, as: :turbo_stream
     assert_response :success
 
-    token = users(:david).reload.theme_sync_token
-    assert token.present?
+    token = response.body[/CAMPFIRE_THEME_KEY=(\w+)/, 1]
+    assert_equal users(:david), User.find_by_theme_sync_token(token)
     assert_turbo_stream action: :replace, target: "omarchy" do
       assert_select "template details[open] textarea#theme_sync_config", text: /CAMPFIRE_THEME_KEY=#{token}/
       assert_select "template textarea#theme_sync_hook", text: /theme_sync/
     end
 
     get edit_account_url
-    assert_select "#omarchy textarea#theme_sync_config", text: /CAMPFIRE_THEME_KEY=#{token}/
+    assert_select "#omarchy textarea#theme_sync_config", count: 0
+    assert_select "#omarchy", text: /Omarchy is connected/
+    assert_no_match token, response.body
   end
 end
