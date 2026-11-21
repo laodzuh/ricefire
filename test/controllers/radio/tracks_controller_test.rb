@@ -33,6 +33,32 @@ class Radio::TracksControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Choose some songs to upload.", flash[:alert]
   end
 
+  test "a song over the size limit" do
+    stub_const(Radio::Track, :MAX_BYTES, 1.kilobyte) do
+      assert_no_difference -> { Radio::Track.count } do
+        post radio_tracks_url, params: { audio_files: [ audio_file("wav") ] }
+      end
+    end
+
+    assert_redirected_to radio_tracks_url
+    assert_equal "Audio is too big (the limit is 1 KB)", flash[:alert]
+  end
+
+  test "an upload stops where the library fills up" do
+    ready_track("Already here", seconds: 10)
+    song = audio_file("mp3")
+    room_for_one_more = Radio::Track.library_bytes + song.size + 1
+
+    stub_const(Radio::Track, :LIBRARY_MAX_BYTES, room_for_one_more) do
+      assert_difference -> { Radio::Track.count }, 1 do
+        post radio_tracks_url, params: { audio_files: [ song, audio_file("mp3") ] }
+      end
+    end
+
+    assert_redirected_to radio_tracks_url
+    assert_match "The radio library is full", flash[:alert]
+  end
+
   test "moving and removing songs" do
     a = ready_track("A", seconds: 10, position: 1)
     b = ready_track("B", seconds: 10, position: 2)

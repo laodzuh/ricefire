@@ -3,7 +3,7 @@ require "test_helper"
 class Users::ThemeSyncsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @user = users(:david)
-    @user.reset_theme_sync_token
+    @token = @user.reset_theme_sync_token
     @colors = Theme::DIRECTORY.join("tokyo-night.toml").read
   end
 
@@ -60,10 +60,18 @@ class Users::ThemeSyncsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "a reset key stops working" do
-    old_token = @user.theme_sync_token
-    @user.reset_theme_sync_token
+    old_token = @token
+    @token = @user.reset_theme_sync_token
 
     sync @colors, token: old_token
+    assert_response :unauthorized
+  end
+
+  test "the database only has a fingerprint of the key, which doesn't work as one" do
+    stored = @user.reload.theme_sync_token_digest
+    assert_not_includes @user.attributes.values.map(&:to_s), @token
+
+    sync @colors, token: stored
     assert_response :unauthorized
   end
 
@@ -76,7 +84,7 @@ class Users::ThemeSyncsControllerTest < ActionDispatch::IntegrationTest
 
   test "any content type, even one Rails parses as params first" do
     put theme_sync_url, params: @colors, headers: {
-      "Authorization" => "Bearer #{@user.theme_sync_token}", "X-Theme-Name" => "nord",
+      "Authorization" => "Bearer #{@token}", "X-Theme-Name" => "nord",
       "Content-Type" => "application/x-www-form-urlencoded"
     }
 
@@ -107,7 +115,7 @@ class Users::ThemeSyncsControllerTest < ActionDispatch::IntegrationTest
   end
 
   private
-    def sync(colors, name: "tokyo-night", token: @user.theme_sync_token)
+    def sync(colors, name: "tokyo-night", token: @token)
       put theme_sync_url, params: colors, headers: {
         "Authorization" => "Bearer #{token}", "X-Theme-Name" => name, "Content-Type" => "text/plain",
         "User-Agent" => "curl/8.10.1"
